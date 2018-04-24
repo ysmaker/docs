@@ -27,7 +27,7 @@ if($handle)
 		{
 			$needle = "/{$ignoreLine}$/";
 			if (preg_match($needle, $stagedFile))
-                unset($stagedFiles[$stagedFileKey ]);
+				unset($stagedFiles[$stagedFileKey ]);
 		}
 	}
 }
