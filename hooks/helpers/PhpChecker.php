@@ -15,6 +15,7 @@ class PhpChecker
 			self::checkTrailingSpaces($changedFile);
 			self::checkTabs($changedFile);
 			self::checkLint($changedFile);
+			self::checkCodeStyle($changedFile);
 		}
 		return self::$errors;
 	}
@@ -22,7 +23,6 @@ class PhpChecker
 	/**
 	 * Проеверка на пробелы в конце строки
 	 * @param  string $changedFile file path
-	 * @return true или array
 	 */
 	public static function checkTrailingSpaces($changedFile)
 	{
@@ -49,9 +49,8 @@ class PhpChecker
 
 	/**
 	 * Проверка на табуляции вместо пробелов
-	 * @return true или array
 	 */
-	public function checkTabs($changedFile)
+	public static function checkTabs($changedFile)
 	{
 		if(empty(self::$errors['Tabs']))
 			self::$errors['Tabs'] = [];
@@ -75,9 +74,8 @@ class PhpChecker
 
 	/**
 	 * Проверяет на PHP ошибки файлы
-	 * @return array или true
 	 */
-	public function checkLint($changedFile)
+	public static function checkLint($changedFile)
 	{
 		if(empty(self::$errors['Lint']))
 			self::$errors['Lint'] = [];
@@ -85,6 +83,34 @@ class PhpChecker
 		exec("php -l '{$changedFile}' 2> /dev/null", $output,$errorsCount);
 		if($errorsCount != 0)
 			self::$errors['Lint'] = array_merge(self::$errors['Lint'],$output);
+	}
+
+	/**
+	 * Проверки по код стайлу
+	 */
+	public static function checkCodeStyle($changedFile)
+	{
+		if(empty(self::$errors['CodeStyle']))
+			self::$errors['CodeStyle'] = [];
+		$handle = fopen($changedFile, "r");
+		$lineNumber = 0;
+		while (($line = fgets($handle)) !== false)
+		{
+			$lineNumber++;
+			// проврка на старые if
+			if (preg_match("/endif|endforeach/i", $line))
+				self::$errors['CodeStyle'][] = "We dont use 'endif' and 'endforeach': {$changedFile} Line {$lineNumber}";
+			// проврка на старые открывающие php скобки
+			if (preg_match("/<\?(?!=|php)/", $line))
+				self::$errors['CodeStyle'][] = "We dont use short open PHP tags: {$changedFile} Line {$lineNumber}";
+			// проврка на перенос фигурной скобки
+			if (preg_match("/(if|foreach|function).*\).*{/i", $line))
+				self::$errors['CodeStyle'][] = "'{' Must begin in a new line: {$changedFile} Line {$lineNumber}";
+			// проврка на название переменных
+			if (preg_match('/\$value|\$key|\$i|\$/i', $line))
+				self::$errors['CodeStyle'][] = "You cant use variables like \$value \$key ...: {$changedFile} Line {$lineNumber}";
+		}
+		fclose($handle);
 	}
 
 	/**

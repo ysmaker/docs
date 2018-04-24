@@ -4,5 +4,14 @@
 ```
 rm -rf .git/hooks
 ln -s ../docs/hooks .git/hooks
-chmod +x .git/hooks/pre-commit
+chmod +x docs/hooks/pre-commit
+```
+
+## Игнорирование файлов и папок
+файл `hooks/.ignore`
+Каждая строчка можем содержать регулярное выражение по которым исключаются файлы например:
+```
+badFile.*
+upload/.*
+testFile\.php
 ```

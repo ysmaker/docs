@@ -3,8 +3,36 @@
 include_once __DIR__.'/helpers/console.php';
 include_once __DIR__.'/helpers/GitParser.php';
 include_once __DIR__.'/helpers/PhpChecker.php';
+$art = <<<ART
+  .g8""8q.                       `7MM                       `7MM
+.dP'    `YM.                       MM                         MM
+dM'      `MM  pd*"*b.      ,p6"bo  MMpMMMb.  .gP"Ya   ,p6"bo  MM  ,MP'.gP"Ya `7Mb,od8
+MM        MM (O)   j8     6M'  OO  MM    MM ,M'   Yb 6M'  OO  MM ;Y  ,M'   Yb  MM' ''
+MM.      ,MP     ,;j9     8M       MM    MM 8M"""""" 8M       MM;Mm  8M""""""  MM
+`Mb.    ,dP'  ,-='        YM.    , MM    MM YM.    , YM.    , MM `Mb.YM.    ,  MM
+  `"bmmd"'   Ammmmmmm      YMbmd'.JMML  JMML.`Mbmmd'  YMbmd'.JMML. YA.`Mbmmd'.JMML.
+ART;
+Console::log($art, 'light_cyan');
 
 $stagedFiles = GitParser::getStagedFiles();
+// определяем игнорируемые файлы
+// удаляем их из списка проверки
+$handle = fopen(__DIR__.'/.ignore', "r");
+if($handle)
+{
+	while (($ignoreLine = fgets($handle)) !== false)
+	{
+		$ignoreLine = str_replace(PHP_EOL, '', $ignoreLine);
+		foreach ($stagedFiles as $stagedFileKey => $stagedFile)
+		{
+			$needle = "/{$ignoreLine}$/";
+			if (preg_match($needle, $stagedFile))
+                unset($stagedFiles[$stagedFileKey ]);
+		}
+	}
+}
+
+// проверки
 $phpCheck    = PhpChecker::run($stagedFiles);
 $hasErrors   = false;
 foreach ($phpCheck as $checkName => $errors)
@@ -17,7 +45,7 @@ foreach ($phpCheck as $checkName => $errors)
 			Console::log("{$error}", 'red');
 	}
 	else
-		Console::log("{$checkName}...ok", 'green');
+		Console::log("{$checkName}..............ok", 'green');
 }
 
 if($hasErrors)
