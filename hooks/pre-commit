@@ -4,22 +4,15 @@ include_once __DIR__.'/helpers/console.php';
 include_once __DIR__.'/helpers/GitParser.php';
 include_once __DIR__.'/helpers/PhpChecker.php';
 
-# Console::log('Im Red!', 'red');
-# Console::log('Im Blue on White!', 'white', true, 'blue');
+$stagedFiles = GitParser::getStagedFiles();
+$phpCheck = PhpChecker::run($stagedFiles);
 
-# Console::log('I dont have an EOF', false);
-# Console::log("\tThis is where I come in.", 'light_green');
-# Console::log('You can swap my variables', 'black', 'yellow');
-# Console::log(str_repeat('-', 60));
-
-# echo Console::bell();
-
-// $out = GitParser::getStagedFiles();
-$out = GitParser::getDiffLines();
 echo "<pre>";
 print_r($out);
 
-throw new Exception(sprintf('There are coding standards violations!'));
+throw new Exception('There are coding standards violations!1');
+throw new Exception('There are coding standards violations!2');
+throw new Exception('There are coding standards violations!3');
 function extractCommitedFiles()
 {
     $output = array();
