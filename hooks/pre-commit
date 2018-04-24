@@ -5,27 +5,20 @@ include_once __DIR__.'/helpers/GitParser.php';
 include_once __DIR__.'/helpers/PhpChecker.php';
 
 $stagedFiles = GitParser::getStagedFiles();
-$phpCheck = PhpChecker::run($stagedFiles);
-
-echo "<pre>";
-print_r($out);
-
-throw new Exception('There are coding standards violations!1');
-throw new Exception('There are coding standards violations!2');
-throw new Exception('There are coding standards violations!3');
-function extractCommitedFiles()
+$phpCheck    = PhpChecker::run($stagedFiles);
+$hasErrors   = false;
+foreach ($phpCheck as $checkName => $errors)
 {
-    $output = array();
-    $rc = 0;
-
-    exec('git rev-parse --verify HEAD 2> /dev/null', $output, $rc);
-
-    $against = '4b825dc642cb6eb9a060e54bf8d69288fbee4904';
-    if ($rc == 0) {
-        $against = 'HEAD';
-    }
-
-    exec("git diff-index --cached --name-status $against | egrep '^(A|M)' | awk '{print $2;}'", $output);
-
-    return $output;
+	if(is_array($errors) && count($errors))
+	{
+		$hasErrors = true;
+		Console::log("{$checkName}", 'yellow');
+		foreach ($errors as $error)
+			Console::log("{$error}", 'red');
+	}
+	else
+		Console::log("{$checkName}...ok", 'green');
 }
+
+if($hasErrors)
+	throw new Exception('ERRORS');
