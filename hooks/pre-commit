@@ -4,13 +4,12 @@ include_once __DIR__.'/helpers/console.php';
 include_once __DIR__.'/helpers/GitParser.php';
 include_once __DIR__.'/helpers/PhpChecker.php';
 $art = <<<ART
-  .g8""8q.                       `7MM                       `7MM
-.dP'    `YM.                       MM                         MM
-dM'      `MM  pd*"*b.      ,p6"bo  MMpMMMb.  .gP"Ya   ,p6"bo  MM  ,MP'.gP"Ya `7Mb,od8
-MM        MM (O)   j8     6M'  OO  MM    MM ,M'   Yb 6M'  OO  MM ;Y  ,M'   Yb  MM' ''
-MM.      ,MP     ,;j9     8M       MM    MM 8M"""""" 8M       MM;Mm  8M""""""  MM
-`Mb.    ,dP'  ,-='        YM.    , MM    MM YM.    , YM.    , MM `Mb.YM.    ,  MM
-  `"bmmd"'   Ammmmmmm      YMbmd'.JMML  JMML.`Mbmmd'  YMbmd'.JMML. YA.`Mbmmd'.JMML.
+ ██████╗ ██████╗
+██╔═══██╗╚════██╗
+██║   ██║ █████╔╝
+██║   ██║██╔═══╝
+╚██████╔╝███████╗
+ ╚═════╝ ╚══════╝
 ART;
 Console::log($art, 'light_cyan');
 
@@ -18,12 +17,16 @@ Console::log($art, 'light_cyan');
 $config       = file_get_contents(__DIR__.'/../config.json');
 $config       = json_decode($config,true);
 $remoteConfig = file_get_contents('https://raw.githubusercontent.com/dzantiev/docs/master/config.json');
-$remoteConfig = json_encode($remoteConfig,true);
+$remoteConfig = json_decode($remoteConfig,true);
+
 if($remoteConfig['version'] != $config['version'])
 {
-	Console::log("UPDATE CHECKER AVALIBLE NEW VERSION {$remoteConfgig['version']}", 'red');
+	Console::log("UPDATE CHECKER AVALIBLE NEW VERSION {$remoteConfig['version']}", 'red');
+	Console::log("Run git pull in docs/ folder", 'red');
 	throw new Exception('UPDATE CHECKER');
 }
+Console::log("Checker Version..............ok", 'green');
+
 
 $stagedFiles = GitParser::getStagedFiles();
 // определяем игнорируемые файлы
