@@ -16,7 +16,7 @@ Console::log($art, 'light_cyan');
 // проверяем версию чекера
 $config       = file_get_contents(__DIR__.'/../config.json');
 $config       = json_decode($config,true);
-$remoteConfig = file_get_contents('https://raw.githubusercontent.com/dzantiev/docs/master/config.json');
+$remoteConfig = file_get_contents('https://raw.githubusercontent.com/dzantiev/docs/master/config.json?v='.uniqid());
 $remoteConfig = json_decode($remoteConfig,true);
 
 if($remoteConfig['version'] != $config['version'])
