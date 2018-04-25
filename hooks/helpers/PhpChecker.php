@@ -109,6 +109,10 @@ class PhpChecker
 			// проврка на название переменных
 			if (preg_match('/\$value(!?\W)|\$key(!?\W)/i', $line))
 				self::$errors['CodeStyle'][] = "You cant use variables like \$value \$key ...: {$changedFile} Line {$lineNumber}";
+			// Проверка установки пробелов перед и после аператоров
+			if (preg_match('/(?<!^| |=|<|>|!|\?)(={1,3}|!={1,2}|\+|-|\/|\*|:|\?|>|<|&&|\|\|)|(={1,3}|!={1,2}|\+|-|\/|\*|:|\?|>|<|&&|\|\|)(?!$| |=|>|php|\?)/m', $line))
+				self::$errors['CodeStyle'][] = "Separate operators with spaces: {$changedFile} Line {$lineNumber}";
+
 		}
 		fclose($handle);
 	}
