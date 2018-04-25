@@ -66,11 +66,13 @@ foreach ($errorArrays as $checkArray)
 			$errors[$checkedSectionName] = $checkedSectionArray;
 
 $hasErrors   = false;
+$errorsCount = 0;
 foreach ($errors as $errorsSectionName => $errorsSection)
 {
 	if(is_array($errorsSection) && count($errorsSection))
 	{
 		$hasErrors = true;
+		$errorsCount += count($errorsSection);
 		Console::log("{$errorsSectionName}", 'yellow');
 		foreach ($errorsSection as $error)
 			Console::log("{$error}", 'red');
@@ -80,4 +82,17 @@ foreach ($errors as $errorsSectionName => $errorsSection)
 }
 
 if($hasErrors)
+{
+	// отправка уведомлений в телеграм
+	if(file_exists(__DIR__.'/../telegram.json'))
+	{
+		$telegram = file_get_contents(__DIR__.'/../telegram.json');
+		$telegram = json_decode($telegram,true);
+		$userName = GitParser::getUserName();
+		$userName = str_replace(' ', '+', $userName);
+		$message  = "<b>{$userName}</b>+make+<b>{$errorsCount}</b>+errors!";
+		file_get_contents("https://api.telegram.org/bot{$telegram['token']}/sendMessage?chat_id={$telegram['chatId']}&text={$message}&parse_mode=html");
+	}
+
 	throw new Exception('ERRORS');
+}

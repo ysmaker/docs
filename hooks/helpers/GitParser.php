@@ -43,5 +43,16 @@ class GitParser
 		return $output;
 	}
 
+	/**
+	 * Достает имя пользователя
+	 * @return string
+	 */
+	public static function getUserName()
+	{
+		exec('git config user.name', $output);
+		if(empty($output)) return 'No Username';
+		return reset($output);
+	}
+
 
 }

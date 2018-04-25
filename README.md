@@ -13,3 +13,13 @@ badFile.*
 upload/.*
 testFile\.php
 ```
+
+## Уведомления
+Создать файл  `docs/telegram.json`
+Пример содержимого:
+```
+{
+	"token":"<токен бота>",
+	"chatId":"<chat_id>"
+}
+```
