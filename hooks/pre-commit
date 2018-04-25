@@ -32,17 +32,20 @@ Console::log("Checker Version..............ok", 'green');
 $stagedFiles = GitParser::getStagedFiles();
 // определяем игнорируемые файлы
 // удаляем их из списка проверки
-$handle = fopen(__DIR__.'/.ignore', "r");
-if($handle)
+if(file_exists(__DIR__.'/.ignore'))
 {
-	while (($ignoreLine = fgets($handle)) !== false)
+	$handle = fopen(__DIR__.'/.ignore', "r");
+	if($handle)
 	{
-		$ignoreLine = str_replace(PHP_EOL, '', $ignoreLine);
-		foreach ($stagedFiles as $stagedFileKey => $stagedFile)
+		while (($ignoreLine = fgets($handle)) !== false)
 		{
-			$needle = "/{$ignoreLine}$/";
-			if (preg_match($needle, $stagedFile))
-				unset($stagedFiles[$stagedFileKey ]);
+			$ignoreLine = str_replace(PHP_EOL, '', $ignoreLine);
+			foreach ($stagedFiles as $stagedFileKey => $stagedFile)
+			{
+				$needle = "/{$ignoreLine}$/";
+				if (preg_match($needle, $stagedFile))
+					unset($stagedFiles[$stagedFileKey ]);
+			}
 		}
 	}
 }
