@@ -3,6 +3,7 @@
 include_once __DIR__.'/helpers/console.php';
 include_once __DIR__.'/helpers/GitParser.php';
 include_once __DIR__.'/helpers/PhpChecker.php';
+include_once __DIR__.'/helpers/HtmlChecker.php';
 $art = <<<ART
  ██████╗ ██████╗
 ██╔═══██╗╚════██╗
@@ -51,19 +52,31 @@ if(file_exists(__DIR__.'/.ignore'))
 }
 
 // проверки
-$phpCheck    = PhpChecker::run($stagedFiles);
+$errorArrays              = [];
+$errorArrays['phpCheck']  = PhpChecker::run($stagedFiles);
+$errorArrays['htmlCheck'] = HtmlChecker::run($stagedFiles);
+
+// собираем все проверки в один массив для вывода
+$errors = [];
+foreach ($errorArrays as $checkArray)
+	foreach ($checkArray as $checkedSectionName => $checkedSectionArray)
+		if(array_key_exists($checkedSectionName, $errors))
+			$errors[$checkedSectionName] = array_merge($errors[$checkedSectionName],$checkedSectionArray);
+		else
+			$errors[$checkedSectionName] = $checkedSectionArray;
+
 $hasErrors   = false;
-foreach ($phpCheck as $checkName => $errors)
+foreach ($errors as $errorsSectionName => $errorsSection)
 {
-	if(is_array($errors) && count($errors))
+	if(is_array($errorsSection) && count($errorsSection))
 	{
 		$hasErrors = true;
-		Console::log("{$checkName}", 'yellow');
-		foreach ($errors as $error)
+		Console::log("{$errorsSectionName}", 'yellow');
+		foreach ($errorsSection as $error)
 			Console::log("{$error}", 'red');
 	}
 	else
-		Console::log("{$checkName}..............ok", 'green');
+		Console::log("{$errorsSectionName}..............ok", 'green');
 }
 
 if($hasErrors)
