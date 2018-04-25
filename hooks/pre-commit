@@ -14,6 +14,17 @@ MM.      ,MP     ,;j9     8M       MM    MM 8M"""""" 8M       MM;Mm  8M""""""  M
 ART;
 Console::log($art, 'light_cyan');
 
+// проверяем версию чекера
+$config       = file_get_contents(__DIR__.'/../config.json');
+$config       = json_decode($config,true);
+$remoteConfig = file_get_contents('https://raw.githubusercontent.com/dzantiev/docs/master/config.json');
+$remoteConfig = json_encode($remoteConfig,true);
+if($remoteConfig['version'] != $config['version'])
+{
+	Console::log("UPDATE CHECKER AVALIBLE NEW VERSION {$remoteConfgig['version']}", 'red');
+	throw new Exception('UPDATE CHECKER');
+}
+
 $stagedFiles = GitParser::getStagedFiles();
 // определяем игнорируемые файлы
 // удаляем их из списка проверки
