@@ -21,9 +21,10 @@ $remoteConfig = json_decode($remoteConfig,true);
 
 if($remoteConfig['version'] != $config['version'])
 {
-	Console::log("UPDATE CHECKER AVALIBLE NEW VERSION {$remoteConfig['version']}", 'red');
-	Console::log("Run git pull in docs/ folder", 'red');
-	throw new Exception('UPDATE CHECKER');
+	exec('cd docs && git pull && cd ../');
+	Console::log("Checker updated new version {$remoteConfig['version']}", 'green');
+	Console::log("Commit again", 'red');
+	throw new Exception('Checker Updated');
 }
 Console::log("Checker Version..............ok", 'green');
 
