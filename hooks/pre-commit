@@ -90,7 +90,7 @@ if($hasErrors)
 		$telegram = json_decode($telegram,true);
 		$userName = GitParser::getUserName();
 		$userName = str_replace(' ', '+', $userName);
-		$message  = "<b>{$userName}</b>+make+<b>{$errorsCount}</b>+errors!";
+		$message  = "<b>{$userName}</b>+made+<b>{$errorsCount}</b>+errors!";
 		file_get_contents("https://api.telegram.org/bot{$telegram['token']}/sendMessage?chat_id={$telegram['chatId']}&text={$message}&parse_mode=html");
 	}
 
