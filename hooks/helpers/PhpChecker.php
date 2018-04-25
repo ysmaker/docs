@@ -98,7 +98,7 @@ class PhpChecker
 		{
 			$lineNumber++;
 			// проврка на старые if
-			if (preg_match("/endif|endforeach/i", $line))
+			if (preg_match("/endif|endforeach/i", $line) && !preg_match("/<!--/i", $line))
 				self::$errors['CodeStyle'][] = "We dont use 'endif' and 'endforeach': {$changedFile} Line {$lineNumber}";
 			// проврка на старые открывающие php скобки
 			if (preg_match("/<\?(?!=|php)/", $line))
