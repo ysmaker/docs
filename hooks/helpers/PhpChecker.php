@@ -107,7 +107,7 @@ class PhpChecker
 			if (preg_match("/(if|foreach|function).*\).*{/i", $line))
 				self::$errors['CodeStyle'][] = "'{' Must begin in a new line: {$changedFile} Line {$lineNumber}";
 			// проврка на название переменных
-			if (preg_match('/\$value|\$key|\$i|\$/i', $line))
+			if (preg_match('/\$value(!?\W)|\$key(!?\W)/i', $line))
 				self::$errors['CodeStyle'][] = "You cant use variables like \$value \$key ...: {$changedFile} Line {$lineNumber}";
 		}
 		fclose($handle);
