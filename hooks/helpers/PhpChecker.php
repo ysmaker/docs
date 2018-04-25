@@ -66,7 +66,7 @@ class PhpChecker
 		{
 			$line = str_replace("\t", '', $line);
 			$lineNumber++;
-			if($line[0] == ' ')
+			if($line[0] == ' ' && (empty($line[1]) || $line[1] != '*') )
 				self::$errors['Tabs'][] = "File {$changedFile} Line {$lineNumber}";
 		}
 		fclose($handle);
