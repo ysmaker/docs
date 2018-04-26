@@ -92,11 +92,48 @@ class PhpChecker
 	{
 		if(empty(self::$errors['CodeStyle']))
 			self::$errors['CodeStyle'] = [];
-		$handle = fopen($changedFile, "r");
+
+		$handle     = fopen($changedFile, "r");
 		$lineNumber = 0;
+		$openPhp    = false;
+
 		while (($line = fgets($handle)) !== false)
 		{
 			$lineNumber++;
+			preg_match_all('/<\?/', $line, $opens, PREG_OFFSET_CAPTURE, 0);
+			preg_match_all('/\?>/', $line, $closes, PREG_OFFSET_CAPTURE, 0);
+			$opens  = $opens[0];
+			$closes = $closes[0];
+
+			$lastOpen  = (!empty($opens)) ? end($opens)[1] : -1;
+			$lastClose = (!empty($closes)) ? end($closes)[1] : -1;
+
+			if($openPhp)
+				array_unshift($opens, [0,0]);
+
+			if($lastOpen >= 0)
+				$openPhp = true;
+
+			if(!$openPhp)
+				continue;
+
+			$newLine = '';
+			foreach($opens as $index => $open)
+			{
+				$end = (isset($closes[$index])) ? ($closes[$index][1] + 2) - $open[1] : null;
+				$phpCode = mb_substr($line, $open[1], $end);
+				$newLine .= $phpCode;
+			}
+			$line = $newLine;
+
+			if($lineNumber == 1)
+				var_dump($line);
+
+			// echo $lineNumber . "\n";
+
+			// Проверка длинны строки
+			if(strlen($line) > 100)
+				self::$errors['CodeStyle'][] = "the line length can not exceed 100 characters: {$changedFile} Line {$lineNumber}";
 			// проврка на старые if
 			if (preg_match("/endif|endforeach/i", $line) && !preg_match("/<!--/i", $line))
 				self::$errors['CodeStyle'][] = "We dont use 'endif' and 'endforeach': {$changedFile} Line {$lineNumber}";
@@ -110,8 +147,14 @@ class PhpChecker
 			if (preg_match('/\$value(!?\W)|\$key(!?\W)|\$array(!?\W)|\$string(!?\W)/i', $line))
 				self::$errors['CodeStyle'][] = "You cant use variables like \$value \$key ...: {$changedFile} Line {$lineNumber}";
 			// Проверка установки пробелов перед и после аператоров
-			if (preg_match('/(?<!^| |=|<|>|!|\?)(={1,3}|!={1,2}|\+|-|\/|\*|:|\?|>|<|&&|\|\|)|(={1,3}|!={1,2}|\+|-|\/|\*|:|\?|>|<|&&|\|\|)(?!$| |=|>|php|\?)/m', $line))
+			if (preg_match('/(?<!^| |=|<|>|!|\?)([^? ]={1,3}|!={1,2}|\+|-[^>]|\/|\*|:|[^<]\?[^=>]|[^-? ]>|<|&&|\|\|)|([^?]={1,3}|!={1,2}|\+|-[^>]|\/|\*|:|[^<]\?[^>=]|[^-?]>|<|&&|\|\|)(?!$| |=|>|php|\?)/', $line))
 				self::$errors['CodeStyle'][] = "Separate operators with spaces: {$changedFile} Line {$lineNumber}";
+			// Проверка пробелов и табов в конце строки
+			if (preg_match('/( |	)$/', $line))
+				self::$errors['CodeStyle'][] = "Do not leave spaces or tabs at the end of the line: {$changedFile} Line {$lineNumber}";
+
+			if($lastClose > $lastOpen)
+				$openPhp = false;
 		}
 		fclose($handle);
 	}
