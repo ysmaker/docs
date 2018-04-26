@@ -125,11 +125,7 @@ class PhpChecker
 				$newLine .= $phpCode;
 			}
 			$line = $newLine;
-
-			if($lineNumber == 1)
-				var_dump($line);
-
-			// echo $lineNumber . "\n";
+			$line = preg_replace('/[\'"].*[\'"]/U', '""', $line);
 
 			// Проверка длинны строки
 			if(strlen($line) > 100)
