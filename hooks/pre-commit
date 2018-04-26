@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+include_once __DIR__.'/helpers/functions.php';
 include_once __DIR__.'/helpers/console.php';
 include_once __DIR__.'/helpers/GitParser.php';
 include_once __DIR__.'/helpers/PhpChecker.php';
@@ -91,7 +92,7 @@ if($hasErrors)
 		$userName = GitParser::getUserName();
 		$userName = str_replace(' ', '+', $userName);
 		$message  = "<b>{$userName}</b>+made+<b>{$errorsCount}</b>+errors!";
-		file_get_contents("https://api.telegram.org/bot{$telegram['token']}/sendMessage?chat_id={$telegram['chatId']}&text={$message}&parse_mode=html");
+		getSSLPage("https://api.telegram.org/bot{$telegram['token']}/sendMessage?chat_id={$telegram['chatId']}&text={$message}&parse_mode=html");
 	}
 
 	throw new Exception('ERRORS');
