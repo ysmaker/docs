@@ -125,11 +125,7 @@ class PhpChecker
 				$newLine .= $phpCode;
 			}
 			$line = $newLine;
-
-			if($lineNumber == 1)
-				var_dump($line);
-
-			// echo $lineNumber . "\n";
+			$line = preg_replace('/[\'"].*[\'"]/U', '""', $line);
 
 			// Проверка длинны строки
 			if(strlen($line) > 100)
@@ -147,7 +143,7 @@ class PhpChecker
 			if (preg_match('/\$value(!?\W)|\$key(!?\W)|\$array(!?\W)|\$string(!?\W)/i', $line))
 				self::$errors['CodeStyle'][] = "You cant use variables like \$value \$key ...: {$changedFile} Line {$lineNumber}";
 			// Проверка установки пробелов перед и после аператоров
-			if (preg_match('/(?<!^| |=|<|>|!|\?)([^? ]={1,3}|!={1,2}|\+|-[^>]|\/|\*|:|[^<]\?[^=>]|[^-? ]>|<|&&|\|\|)|([^?]={1,3}|!={1,2}|\+|-[^>]|\/|\*|:|[^<]\?[^>=]|[^-?]>|<|&&|\|\|)(?!$| |=|>|php|\?)/', $line))
+			if (preg_match('/(?<!^| |=|<|>|!|\?)([^? ]={1,3}|!={1,2}|\+|-[^>]|[^* ]\/[^* ]|[^\/\* ]\*[^\/\* ]|:|[^<]\?[^=>]|[^-? ]>|<|&&|\|\|)|([^?]={1,3}|!={1,2}|\+|-[^>]|[^* ]\/[^* ]|[^\/\* ]\*[^\/\* ]|:|[^<]\?[^>=]|[^-?]>|<|&&|\|\|)(?!$| |=|>|php|\?)/', $line))
 				self::$errors['CodeStyle'][] = "Separate operators with spaces: {$changedFile} Line {$lineNumber}";
 			// Проверка пробелов и табов в конце строки
 			if (preg_match('/( |	)$/', $line))
